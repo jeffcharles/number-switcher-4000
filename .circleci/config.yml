@@ -5,6 +5,7 @@ jobs:
     docker:
       - image: node:8.0.0
     steps:
+      - npm i -g npm@5.0.2
       - checkout
       - restore_cache:
           key: depsl-{{ .Branch }}-{{ checksum "package-lock.json" }}
