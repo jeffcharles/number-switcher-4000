@@ -14,3 +14,15 @@ jobs:
           paths:
             - "node_modules"
       - run: yarn run build
+      - deploy:
+          name: Deploy master to S3
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              apt update
+              apt install -y python-dev python-pip
+              pip install awscli
+
+              mv dist/index.html index.html
+              aws s3 sync dist s3://number-switcher-4000-website --delete --cache-control 'public, max-age=31536000'
+              aws s3 cp index.html s3://number-switcher-4000-website/index.html --cache-control 'no-cache, no-store, must-revalidate'
+            fi
