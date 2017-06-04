@@ -1,0 +1,16 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/number-switcher-4000
+    docker:
+      - image: node:8.0.0
+    steps:
+      - checkout
+      - restore_cache:
+          key: depsl-{{ .Branch }}-{{ checksum "package-lock.json" }}
+      - run: npm install
+      - save_cache:
+          key: depsl-{{ .Branch }}-{{ checksum "package-lock.json" }}
+          paths:
+            - "node_modules"
+      - run: npm run build
