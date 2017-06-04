@@ -3,7 +3,7 @@ jobs:
   build:
     working_directory: ~/number-switcher-4000
     docker:
-      - image: node:8.0.0
+      - image: node:7.10.0
     steps:
       - checkout
       - restore_cache:
