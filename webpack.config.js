@@ -1,3 +1,4 @@
+const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
 
@@ -49,6 +50,10 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       template: 'index.html.ejs'
+    }),
+    new FaviconsWebpackPlugin({
+      logo: './favicon.png',
+      title: 'Number Switcher 4000'
     })
   ],
 
