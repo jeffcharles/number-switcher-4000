@@ -52,18 +52,12 @@ export default class extends React.Component<{}, numbersState> {
     this.setState({ activeNumber: currentNumer });
   }
 
-  onAutoDialIn = async () => {
-    await this.updateS3(`<?xml version="1.0" encoding="UTF-8"?><Response><Play digits="6"></Play></Response>`);
-    this.setState({ activeNumber: 'auto-dial-in' });
-  }
-
-  onUpdateNumber = async (number: string) => {
-    await this.updateS3(`<?xml version="1.0" encoding="UTF-8"?><Response><Dial>${number}</Dial></Response>`);
+  onNumberChange = async (number: string) => {
     this.setState({ activeNumber: number });
-  }
-
-  async updateS3(body: string) {
-    return await this.s3.putObject({
+    const body = number === 'auto-dial-in' ?
+      `<?xml version="1.0" encoding="UTF-8"?><Response><Play digits="6"></Play></Response>` :
+      `<?xml version="1.0" encoding="UTF-8"?><Response><Dial>${number}</Dial></Response>`;
+    await this.s3.putObject({
       Bucket: 'number-switcher-4000',
       Key: 'number.xml',
       Body: body,
@@ -77,11 +71,11 @@ export default class extends React.Component<{}, numbersState> {
     }
     const phoneNumbers = this.state.phoneNumbers;
     return (
-      <RadioGroup name="number" value={this.state.activeNumber}>
+      <RadioGroup name="number" value={this.state.activeNumber} onChange={this.onNumberChange}>
         {Object.keys(phoneNumbers).map(name => (
-          <RadioButton key={name} label={`${name}: ${phoneNumbers[name]}`} value={phoneNumbers[name]} onClick={() => this.onUpdateNumber(phoneNumbers[name])} />
+          <RadioButton key={name} label={`${name}: ${phoneNumbers[name]}`} value={phoneNumbers[name]} />
         ))}
-        <RadioButton label="Automatically dial in" value="auto-dial-in" onClick={this.onAutoDialIn} />
+        <RadioButton label="Automatically dial in" value="auto-dial-in" />
       </RadioGroup>
     );
   }
