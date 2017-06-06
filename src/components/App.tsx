@@ -1,7 +1,10 @@
 import * as React from 'react';
+import AppBar from 'react-toolbox/lib/app_bar';
+import 'normalize.css';
 
 import Login from './Login';
 import Numbers from './Numbers';
+import '../style.css'
 
 interface AppState {
   isLoggedIn: boolean
@@ -16,10 +19,12 @@ export default class extends React.Component<{}, AppState> {
   render() {
     return (
       <div>
-        <h1>Number Switcher 4000</h1>
-        {this.state.isLoggedIn ?
-          <Numbers /> :
-          <Login onSuccessfulLogin={() => this.setState({ isLoggedIn: true })} />}
+        <AppBar title="Number Switcher 4000" />
+        <div style={{margin: 30}}>
+          {this.state.isLoggedIn ?
+            <Numbers /> :
+            <Login onSuccessfulLogin={() => this.setState({ isLoggedIn: true })} />}
+        </div>
       </div>
     );
   }

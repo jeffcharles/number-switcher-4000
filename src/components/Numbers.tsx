@@ -1,6 +1,7 @@
 import * as AWS from 'aws-sdk';
 import * as React from 'react';
 import * as xml2js from 'xml2js';
+import { RadioGroup, RadioButton } from 'react-toolbox/lib/radio';
 
 interface numbersState {
   phoneNumbers: { [name: string]: string } | null
@@ -76,25 +77,12 @@ export default class extends React.Component<{}, numbersState> {
     }
     const phoneNumbers = this.state.phoneNumbers;
     return (
-      <form>
-        <p>Pick a number:</p>
-        <ul>
-          {Object.keys(phoneNumbers).map(name => (
-            <li key={name}>
-              <label>
-                <input type="radio" name="number" checked={this.state.activeNumber === phoneNumbers[name]} onClick={() => this.onUpdateNumber(phoneNumbers[name])} />
-                {name}: {phoneNumbers[name]}
-              </label>
-            </li>
-          ))}
-          <li>
-            <label>
-              <input type="radio" name="number" checked={this.state.activeNumber === 'auto-dial-in'} onClick={this.onAutoDialIn} />
-              Automatically dial in
-            </label>
-          </li>
-        </ul>
-      </form>
+      <RadioGroup name="number" value={this.state.activeNumber}>
+        {Object.keys(phoneNumbers).map(name => (
+          <RadioButton key={name} label={`${name}: ${phoneNumbers[name]}`} value={phoneNumbers[name]} onClick={() => this.onUpdateNumber(phoneNumbers[name])} />
+        ))}
+        <RadioButton label="Automatically dial in" value="auto-dial-in" onClick={this.onAutoDialIn} />
+      </RadioGroup>
     );
   }
 }
