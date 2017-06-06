@@ -5,7 +5,8 @@ import { RadioGroup, RadioButton } from 'react-toolbox/lib/radio';
 
 interface numbersState {
   phoneNumbers: { [name: string]: string } | null
-  activeNumber: string | null
+  activeNumber: string | null,
+  updateStatus: string | null
 }
 
 export default class extends React.Component<{}, numbersState> {
@@ -13,7 +14,7 @@ export default class extends React.Component<{}, numbersState> {
 
   constructor() {
     super();
-    this.state = { phoneNumbers: null, activeNumber: null }
+    this.state = { phoneNumbers: null, activeNumber: null, updateStatus: null }
   }
 
   async componentDidMount() {
@@ -53,16 +54,24 @@ export default class extends React.Component<{}, numbersState> {
   }
 
   onNumberChange = async (number: string) => {
-    this.setState({ activeNumber: number });
+    this.setState({
+      activeNumber: number,
+      updateStatus: 'Updating...'
+    });
     const body = number === 'auto-dial-in' ?
       `<?xml version="1.0" encoding="UTF-8"?><Response><Play digits="6"></Play></Response>` :
       `<?xml version="1.0" encoding="UTF-8"?><Response><Dial>${number}</Dial></Response>`;
-    await this.s3.putObject({
-      Bucket: 'number-switcher-4000',
-      Key: 'number.xml',
-      Body: body,
-      ContentType: 'application/xml'
-    }).promise();
+    try {
+      await this.s3.putObject({
+        Bucket: 'number-switcher-4000',
+        Key: 'number.xml',
+        Body: body,
+        ContentType: 'application/xml'
+      }).promise();
+      this.setState({ updateStatus: 'Updated' });
+    } catch (err) {
+      this.setState({ updateStatus: `Error updating number: ${err}` });
+    }
   }
 
   render() {
@@ -71,12 +80,15 @@ export default class extends React.Component<{}, numbersState> {
     }
     const phoneNumbers = this.state.phoneNumbers;
     return (
-      <RadioGroup name="number" value={this.state.activeNumber} onChange={this.onNumberChange}>
-        {Object.keys(phoneNumbers).map(name => (
-          <RadioButton key={name} label={`${name}: ${phoneNumbers[name]}`} value={phoneNumbers[name]} />
-        ))}
-        <RadioButton label="Automatically dial in" value="auto-dial-in" />
-      </RadioGroup>
+      <div>
+        <RadioGroup name="number" value={this.state.activeNumber} onChange={this.onNumberChange}>
+          {Object.keys(phoneNumbers).map(name => (
+            <RadioButton key={name} label={`${name}: ${phoneNumbers[name]}`} value={phoneNumbers[name]} />
+          ))}
+          <RadioButton label="Automatically dial in" value="auto-dial-in" />
+        </RadioGroup>
+        <p style={{fontStyle: 'italic' }}>{this.state.updateStatus}</p>
+      </div>
     );
   }
 }
