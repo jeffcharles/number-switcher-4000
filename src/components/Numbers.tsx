@@ -68,7 +68,7 @@ export default class extends React.Component<{}, numbersState> {
         Body: body,
         ContentType: 'application/xml'
       }).promise();
-      this.setState({ updateStatus: 'Updated' });
+      this.setState({ updateStatus: null });
     } catch (err) {
       this.setState({ updateStatus: `Error updating number: ${err}` });
     }
